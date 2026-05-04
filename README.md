@@ -1,1 +1,1 @@
-# React-RSShool
+# React-RSSchool
