@@ -1,24 +1,29 @@
 import React from 'react';
 
-interface MovieProps {
-  title: string;
-  year: string;
-  type?: string;
-  poster: string;
+export interface MovieProps {
+  imdbID: string;
+  Title: string;
+  Year: string;
+  Type?: string;
+  Poster: string;
 }
 class Movie extends React.Component<MovieProps> {
   constructor(props: MovieProps) {
     super(props);
   }
   render() {
+    const { Title: title, Poster: poster, imdbID: id, Year: year } = this.props;
     return (
-      <div className="movie-card">
-        <img src={this.props.poster} alt={this.props.title} />
-        <div className="movie-info">
-          <div className="movie-title">{this.props.title}</div>
-          <div className="movie-year">{this.props.year}</div>
+      <li className="movie-card" key={id}>
+        <div className="movie-image">
+          <img src={poster} alt={title} />
         </div>
-      </div>
+
+        <div className="movie-info">
+          <p className="movie-title">{title}</p>
+          <p className="movie-year">{year}</p>
+        </div>
+      </li>
     );
   }
 }
