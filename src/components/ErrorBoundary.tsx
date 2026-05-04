@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component<Props, State> {
       return (
         <div className="boundary-content">
           <h1>Sorry... Something went wrong.</h1>;
-          <a className="link" href="/">
+          <a className="link" href="/rsschool-react/">
             Try again
           </a>
         </div>
