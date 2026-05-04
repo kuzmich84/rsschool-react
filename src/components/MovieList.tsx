@@ -11,11 +11,14 @@ class MovieList extends React.Component<MovieListProps> {
   }
 
   render() {
+    const { movies = [] } = this.props;
     return (
       <ul className="movie-list">
-        {this.props.movies.map((movie) => (
-          <Movie {...movie} key={movie.imdbID} />
-        ))}
+        {movies.length ? (
+          movies.map((movie) => <Movie {...movie} key={movie.imdbID} />)
+        ) : (
+          <h2>Nothing Found</h2>
+        )}
       </ul>
     );
   }
