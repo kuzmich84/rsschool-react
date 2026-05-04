@@ -7,6 +7,7 @@ import LoadMore from './components/LoadMore';
 import Preloader from './components/Preloader';
 
 const API_KEY = '61ba9e64';
+const URL_API = 'https://www.omdbapi.com';
 class App extends React.Component {
   state = {
     movies: [],
@@ -14,6 +15,7 @@ class App extends React.Component {
     page: 1,
     isLoadMore: true,
     isLoading: false,
+    error: '',
   };
 
   async componentDidMount(): Promise<void> {
@@ -22,14 +24,26 @@ class App extends React.Component {
       this.setState({ isLoadMore: false });
     }
     try {
-      const response = await fetch(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${this.state.localSearch}`,
-      );
+      const response = await fetch(`${URL_API}/?apikey=${API_KEY}&s=${this.state.localSearch}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        this.setState({ error: errorData });
+      }
       const data = await response.json();
+
+      if (data.Response === 'False') {
+        throw new Error(data.Error);
+      }
       this.setState({ movies: data.Search });
       this.setState({ isLoading: false });
-    } catch (err) {
-      console.error(err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this.setState({ error: err.message });
+      } else {
+        this.setState({ error: 'Something went wrong' });
+      }
+
       this.setState({ isLoading: false });
     }
   }
@@ -37,14 +51,26 @@ class App extends React.Component {
   searchMovies = async (search: string, page = 1) => {
     this.setState({ isLoading: true });
     try {
-      const response = await fetch(
-        `https://www.omdbapi.com/?apikey=${API_KEY}&s=${search}&page=${page}`,
-      );
+      const response = await fetch(`${URL_API}/?apikey=${API_KEY}&s=${search}&page=${page}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        this.setState({ error: errorData });
+        throw new Error('Request failed');
+      }
       const data = await response.json();
+      if (data.Response === 'False') {
+        throw new Error(data.Error);
+      }
       this.setState({ movies: data.Search });
       this.setState({ isLoading: false });
-    } catch (err) {
-      console.error(err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        this.setState({ error: err.message });
+      } else {
+        this.setState({ error: 'Something went wrong' });
+      }
+
       this.setState({ isLoading: false });
     }
   };
@@ -66,7 +92,10 @@ class App extends React.Component {
         <Header />
         <Search searchMovies={this.searchMovies} setPage={this.setPage} />
         {this.state.isLoading ? <Preloader /> : <MovieList movies={this.state.movies} />}
-        {this.state.isLoadMore && <LoadMore loadMore={this.loadMore} page={this.state.page} />}
+        {this.state.isLoadMore && !this.state.error && (
+          <LoadMore loadMore={this.loadMore} page={this.state.page} />
+        )}
+        {this.state.error && <h2 className="error-message"> Error: {this.state.error}</h2>}
       </div>
     );
   }
