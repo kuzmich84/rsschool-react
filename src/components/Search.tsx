@@ -22,8 +22,17 @@ class Search extends React.Component<SearchProps, SearchState> {
 
   handleClick = () => {
     if (this.state.search) {
-      localStorage.setItem('search', this.state.search.trim());
-      this.props.searchMovies(this.state.search.trim(), 1);
+      const current = this.state.search.trim();
+      const saved = localStorage.getItem('search') || '';
+
+      if (current === saved) {
+        return;
+      }
+
+      const value = current || 'movie';
+
+      localStorage.setItem('search', value);
+      this.props.searchMovies(value, 1);
       this.props.setPage(1, false);
       this.setState({ search: this.state.search.trim() });
     } else {
