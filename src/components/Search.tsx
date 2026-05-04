@@ -4,9 +4,10 @@ interface SearchState {
   search: string;
 }
 
-type SearchProps = {
-  searchMovies: (search: string) => void;
-};
+interface SearchProps {
+  searchMovies: (search: string, page: number) => void;
+  setPage: (page: number, isLoadMore: boolean) => void;
+}
 class Search extends React.Component<SearchProps, SearchState> {
   constructor(props: SearchProps) {
     super(props);
@@ -22,9 +23,12 @@ class Search extends React.Component<SearchProps, SearchState> {
   handleClick = () => {
     if (this.state.search) {
       localStorage.setItem('search', this.state.search);
-      this.props.searchMovies(this.state.search);
+      this.props.searchMovies(this.state.search, 1);
+      this.props.setPage(1, false);
     } else {
-      this.props.searchMovies('movie');
+      this.props.searchMovies('movie', 1);
+      this.props.setPage(1, true);
+      localStorage.removeItem('search');
     }
   };
 
@@ -33,7 +37,7 @@ class Search extends React.Component<SearchProps, SearchState> {
       <div className="search-content">
         <input
           type="text"
-          placeholder="search"
+          placeholder="Try to search a movie..."
           value={this.state.search}
           onChange={this.handleChange}
         />
